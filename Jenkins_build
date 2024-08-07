@@ -22,5 +22,20 @@ pipeline {
                 sh "docker run -d -p 8000:8000 --name my-note my-note-app"
             }
         }
+
+        stage("Push Image to Docker Hub") {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerHub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    echo "Logging in to Docker Hub"
+                    sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
+                    
+                    echo "Tagging the image"
+                    sh "docker tag my-note-app $DOCKER_USERNAME/my-note-app:latest"
+                    
+                    echo "Pushing the image to Docker Hub"
+                    sh "docker push $DOCKER_USERNAME/my-note-app:latest"
+                }
+            }
+        }
     }
 }
