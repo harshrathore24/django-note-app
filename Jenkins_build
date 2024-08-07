@@ -1,6 +1,10 @@
 pipeline {
     agent any
     
+    environment {
+        DOCKER_TAG = "my-note-app:${env.BUILD_TIMESTAMP}"
+    }
+    
     stages {
         stage("Clone Code") {
             steps {
@@ -11,15 +15,21 @@ pipeline {
    
         stage("Build and Run") {
             steps {
-                echo "Building the image"
-                sh "docker build -t my-note-app ."
+                script {
+                    echo "Generating unique version tag"
+                    env.BUILD_TIMESTAMP = sh(script: 'date +"%Y%m%d%H%M%S"', returnStdout: true).trim()
+                    env.DOCKER_TAG = "my-note-app:${env.BUILD_TIMESTAMP}"
+                }
+
+                echo "Building the image with tag ${env.DOCKER_TAG}"
+                sh "docker build -t ${env.DOCKER_TAG} ."
                 
                 echo "Stopping and removing any existing container with the same name"
                 sh "docker stop my-note || true"
                 sh "docker rm my-note || true"
                 
                 echo "Running the container"
-                sh "docker run -d -p 8000:8000 --name my-note my-note-app"
+                sh "docker run -d -p 8000:8000 --name my-note ${env.DOCKER_TAG}"
             }
         }
 
@@ -29,11 +39,11 @@ pipeline {
                     echo "Logging in to Docker Hub"
                     sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
                     
-                    echo "Tagging the image"
-                    sh "docker tag my-note-app $DOCKER_USERNAME/my-note-app:latest"
+                    echo "Tagging the image with ${env.DOCKER_TAG}"
+                    sh "docker tag ${env.DOCKER_TAG} $DOCKER_USERNAME/${env.DOCKER_TAG}"
                     
                     echo "Pushing the image to Docker Hub"
-                    sh "docker push $DOCKER_USERNAME/my-note-app:latest"
+                    sh "docker push $DOCKER_USERNAME/${env.DOCKER_TAG}"
                 }
             }
         }
