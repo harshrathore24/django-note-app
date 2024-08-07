@@ -28,19 +28,19 @@ pipeline {
             steps {
                 echo "Tagging the image with the version parameter"
                 script {
-                    def imagename = "harshrathore24/my-note-app"
+                    def imageName = "harshrathore24/my-note-app"
                     def credentialsId = 'dockerHub'
                     def userVersion = "${params.VERSION}"
 
                     withCredentials([usernamePassword(credentialsId: credentialsId, passwordVariable: 'dockerHubPass', usernameVariable: 'dockerHubUser')]) {
-                        def newTag = "latest.v${userVersion}"
+                        def newTag = "v${userVersion}"
 
                         echo "Tagging the image with the new version: ${newTag}"
-                        sh "docker tag ${imagename}:latest ${imagename}:latest.${newTag}"
+                        sh "docker tag ${imageName}:latest ${imageName}:${newTag}"
 
                         echo "Pushing the image to Docker Hub"
                         sh "docker login -u ${dockerHubUser} -p ${dockerHubPass}"
-                        sh "docker push ${imagename}:latest.${newTag}"
+                        sh "docker push ${imageName}:${newTag}"
                     }
                 }
             }
