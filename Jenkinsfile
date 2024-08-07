@@ -8,6 +8,12 @@ pipeline {
                 git url:"https://github.com/harshrathore24/django-note-app.git", branch: "main"
             }
         }
+    stage('Test Docker') {
+      steps {
+         sh 'docker run --rm hello-world'
+         }
+       }
+
         stage("Build"){
             steps {
                 echo "Building the image"
