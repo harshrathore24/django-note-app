@@ -1,0 +1,68 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_TAG_BASE = "my-note-app"
+        DOCKER_LATEST_TAG = "latest"
+        DOCKER_USERNAME = ''
+        DOCKER_PASSWORD = ''
+    }
+    
+    stages {
+        stage("Clone Code") {
+            steps {
+                echo "Cloning the code"
+                git url: "https://github.com/harshrathore24/django-note-app.git", branch: "main"
+            }
+        }
+
+        stage("Determine Next Version Tag") {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'dockerHub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        echo "Fetching the latest tags from Docker Hub"
+                        def tags = sh(script: "curl -s -u $DOCKER_USERNAME:$DOCKER_PASSWORD https://registry.hub.docker.com/v2/repositories/$DOCKER_USERNAME/$DOCKER_TAG_BASE/tags | jq -r '.results[].name'", returnStdout: true).trim()
+                        echo "Existing tags: $tags"
+                        
+                        def latestTag = tags.tokenize().findAll { it.startsWith('v') }.collect { it[1..-1].toInteger() }.max() ?: 0
+                        def nextVersion = latestTag + 1
+                        env.DOCKER_TAG = "${DOCKER_TAG_BASE}:v${nextVersion}"
+                        env.DOCKER_LATEST_TAG = "${DOCKER_TAG_BASE}:latest"
+                        
+                        echo "Next version tag will be: ${env.DOCKER_TAG}"
+                    }
+                }
+            }
+        }
+
+        stage("Build and Run") {
+            steps {
+                echo "Building the image with tag ${env.DOCKER_TAG}"
+                sh "docker build -t ${env.DOCKER_TAG} ."
+                
+                echo "Stopping and removing any existing container with the same name"
+                sh "docker stop my-note || true"
+                sh "docker rm my-note || true"
+                
+                echo "Running the container"
+                sh "docker run -d -p 8000:8000 --name my-note ${env.DOCKER_TAG}"
+            }
+        }
+
+        stage("Push Image to Docker Hub") {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerHub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    echo "Logging in to Docker Hub"
+                    sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
+                    
+                    echo "Tagging the image with ${env.DOCKER_LATEST_TAG}"
+                    sh "docker tag ${env.DOCKER_TAG} $DOCKER_USERNAME/${env.DOCKER_LATEST_TAG}"
+                    
+                    echo "Pushing the image to Docker Hub"
+                    sh "docker push $DOCKER_USERNAME/${env.DOCKER_TAG}"
+                    sh "docker push $DOCKER_USERNAME/${env.DOCKER_LATEST_TAG}"
+                }
+            }
+        }
+    }
+}
