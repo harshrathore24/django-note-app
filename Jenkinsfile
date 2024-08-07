@@ -9,16 +9,18 @@ pipeline {
             }
         }
    
-        stage("Build") {
+        stage("Build and Run") {
             steps {
                 echo "Building the image"
                 sh "docker build -t my-note-app ."
-                sh "docker run -d -p 3000:80 --name my-note my-note-app"
-
+                
+                echo "Stopping and removing any existing container with the same name"
+                sh "docker stop my-note || true"
+                sh "docker rm my-note || true"
+                
+                echo "Running the container"
+                sh "docker run -d -p 8000:8000 --name my-note my-note-app"
             }
         }
-   
-
     }
 }
-
