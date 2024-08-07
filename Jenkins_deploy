@@ -11,8 +11,10 @@ pipeline {
         
         stage("Run Docker Container") {
             steps {
-                echo "Stopping and removing any existing container with the same name"
+                echo "Stopping any existing container with the same name"
                 sh "docker stop my-note || true"
+                
+                echo "Removing any existing container with the same name"
                 sh "docker rm my-note || true"
                 
                 echo "Running the container"
