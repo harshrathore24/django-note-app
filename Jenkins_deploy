@@ -5,7 +5,7 @@ pipeline {
         stage("Pull Image from Docker Hub") {
             steps {
                 echo "Pulling the Docker image from Docker Hub"
-                sh "docker pull harshrathore24/my-note-app:latest"
+                sh "docker pull harshrathore24/my-note-app:latest.v2"
             }
         }
         
@@ -18,7 +18,7 @@ pipeline {
                 sh "docker rm my-note || true"
                 
                 echo "Running the container"
-                sh "docker run -d -p 8000:8000 --name my-note harshrathore24/my-note-app:latest"
+                sh "docker run -d -p 8000:8000 --name my-note harshrathore24/my-note-app:latest.v2"
             }
         }
     }
