@@ -1,6 +1,10 @@
 pipeline {
     agent any
-    
+
+    parameters {
+        string(name: 'VERSION', defaultValue: 'latest', description: 'The version tag for the Docker image')
+    }
+
     stages {
         stage("Pull Image from Docker Hub") {
             steps {
@@ -22,28 +26,15 @@ pipeline {
         
         stage("Tag and Push to Docker Hub") {
             steps {
-                echo "Determining the next version tag"
+                echo "Tagging the image with the version parameter"
                 script {
                     def imageName = "harshrathore24/my-note-app"
                     def credentialsId = 'dockerHub'
-                    def tagPrefix = "latest.v"
-                    
+                    def userVersion = "${params.VERSION}"
+
                     withCredentials([usernamePassword(credentialsId: credentialsId, passwordVariable: 'dockerHubPass', usernameVariable: 'dockerHubUser')]) {
-                        def existingTags = sh(script: "curl -s -u ${dockerHubUser}:${dockerHubPass} https://hub.docker.com/v2/repositories/${imageName}/tags/?page_size=100 | jq -r '.results[].name'", returnStdout: true).trim().split('\n')
-                        def maxVersion = 0
-                        
-                        existingTags.each { tag ->
-                            if (tag.startsWith(tagPrefix)) {
-                                def version = tag.replace(tagPrefix, '').toInteger()
-                                if (version > maxVersion) {
-                                    maxVersion = version
-                                }
-                            }
-                        }
-                        
-                        def nextVersion = maxVersion + 1
-                        def newTag = "${tagPrefix}${nextVersion}"
-                        
+                        def newTag = "latest.v${userVersion}"
+
                         echo "Tagging the image with the new version: ${newTag}"
                         sh "docker tag ${imageName}:latest ${imageName}:${newTag}"
 
