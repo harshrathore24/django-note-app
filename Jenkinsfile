@@ -16,24 +16,7 @@ pipeline {
             }
         }
    
-        stage("Push to Docker Hub") {
-            steps {
-                echo "Pushing the image to Docker Hub"
-                withCredentials([usernamePassword(credentialsId: "dockerHub", passwordVariable: "dockerHubPass", usernameVariable: "dockerHubUser")]) {
-                    sh "docker tag my-note-app ${env.dockerHubUser}/my-note-app:latest"
-                    sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
-                    sh "docker push ${env.dockerHubUser}/my-note-app:latest"
-                }
-            }
-        }
-   
-        stage("Deploy") {
-            steps {
-                echo "Deploying the container"
-                sh "docker-compose down || true" // Use || true to avoid failing if no containers are running
-                sh "docker-compose up -d"
-            }
-        }
+
     }
 }
 
