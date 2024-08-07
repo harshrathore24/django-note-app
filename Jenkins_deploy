@@ -2,24 +2,21 @@ pipeline {
     agent any
     
     stages {
-        stage("Clone Code") {
+        stage("Pull Image from Docker Hub") {
             steps {
-                echo "Cloning the code"
-                git url: "https://github.com/harshrathore24/django-note-app.git", branch: "main"
+                echo "Pulling the Docker image from Docker Hub"
+                sh "docker pull harshrathore24/my-note-app:latest"
             }
         }
-   
-        stage("Build and Run") {
+        
+        stage("Run Docker Container") {
             steps {
-                echo "Building the image"
-                sh "docker build -t my-note-app ."
-                
                 echo "Stopping and removing any existing container with the same name"
                 sh "docker stop my-note || true"
                 sh "docker rm my-note || true"
                 
                 echo "Running the container"
-                sh "docker run -d -p 8000:8000 --name my-note my-note-app"
+                sh "docker run -d -p 8000:8000 --name my-note harshrathore24/my-note-app:latest"
             }
         }
     }
