@@ -1,29 +1,40 @@
 pipeline {
     agent any
-
+    
     parameters {
-        string(name: 'VERSION', defaultValue: 'latest', description: 'The version tag for the Docker image')
+        string(name: 'VERSION_TAG', defaultValue: 'latest', description: 'The version tag for the Docker image')
     }
-
+     environment {
+        DOCKER_TAG = "my-note-app:${params.VERSION_TAG}"
+     }
+    
     stages {
-        stage("Pull Image from Docker Hub") {
+        stage("Clone Code") {
             steps {
-                echo "Pulling the Docker image from Docker Hub"
-                sh "docker pull harshrathore24/my-note-app:latest"
+                echo "Cloning the code"
+                git url: "https://github.com/harshrathore24/django-note-app.git", branch: "main"
             }
         }
-        
-        stage("Run Docker Container") {
+   }
+   stage("Build and Run") {
             steps {
+                script {
+                    echo "Using provided version tag"
+                    env.DOCKER_TAG = "my-note-app:${params.VERSION_TAG}"
+                }
+
+                echo "Building the image with tag ${env.DOCKER_TAG}"
+                sh "docker build -t ${env.DOCKER_TAG} ."
+                
                 echo "Stopping and removing any existing container with the same name"
-                sh "docker stop test_version || true"
-                sh "docker rm test_version || true"
+                sh "docker stop my-note || true"
+                sh "docker rm my-note || true"
                 
                 echo "Running the container"
-                sh "docker run -d -p 8800:8000 --name test_version harshrathore24/my-note-app:latest"
+                sh "docker run -d -p 8000:8000 --name my-note ${env.DOCKER_TAG}"
             }
         }
-        
+
         stage("Tag and Push to Docker Hub") {
             steps {
                 echo "Tagging the image with the version parameter"
@@ -45,5 +56,4 @@ pipeline {
                 }
             }
         }
-    }
 }
