@@ -2,56 +2,39 @@ pipeline {
     agent any
     
     parameters {
-        string(name: 'VERSION_TAG', defaultValue: 'latest', description: 'The version tag for the Docker image')
-    }
-    
-    environment {
-        DOCKER_TAG = "my-note-app:${params.VERSION_TAG}"
+        string(name: 'DOCKER_TAG', defaultValue: 'latest.v1', description: 'Docker tag for the image')
     }
     
     stages {
-        stage("Clone Code") {
+        stage("Pull Image from Docker Hub") {
             steps {
-                echo "Cloning the code"
-                git url: "https://github.com/harshrathore24/django-note-app.git", branch: "main"
+                echo "Pulling the Docker image from Docker Hub"
+                sh "docker pull harshrathore24/my-note-app:latest"
             }
         }
-   
-        stage("Build and Run") {
-            steps {
-                script {
-                    echo "Using provided version tag"
-                    env.DOCKER_TAG = "my-note-app:${params.VERSION_TAG}"
-                }
 
-                echo "Building the image with tag ${env.DOCKER_TAG}"
-                sh "docker build -t ${env.DOCKER_TAG} ."
-                
+        stage("Run Docker Container") {
+            steps {
                 echo "Stopping and removing any existing container with the same name"
-                sh "docker stop my-note || true"
-                sh "docker rm my-note || true"
-                
+                sh "docker stop test_version || true"
+                sh "docker rm test_version || true"
+
                 echo "Running the container"
-                sh "docker run -d -p 8000:8000 --name my-note ${env.DOCKER_TAG}"
+                sh "docker run -d -p 8800:8000 --name test_version harshrathore24/my-note-app:latest"
             }
         }
 
         stage("Tag and Push to Docker Hub") {
             steps {
                 script {
-                    def imageName = "harshrathore24/my-note-app"
-                    def credentialsId = 'dockerHub'
-                    def userVersion = "${params.VERSION_TAG}"
+                    def newTag = params.DOCKER_TAG
+                    echo "Tagging the image with the new version: ${newTag}"
+                    sh "docker tag harshrathore24/my-note-app:latest harshrathore24/my-note-app:${newTag}"
 
-                    withCredentials([usernamePassword(credentialsId: credentialsId, passwordVariable: 'dockerHubPass', usernameVariable: 'dockerHubUser')]) {
-                        def newTag = "v${userVersion}"
-
-                        echo "Tagging the image with the new version: ${newTag}"
-                        sh "docker tag ${imageName}:latest ${imageName}:${newTag}"
-
-                        echo "Pushing the image to Docker Hub"
-                        sh "docker login -u ${dockerHubUser} -p ${dockerHubPass}"
-                        sh "docker push ${imageName}:${newTag}"
+                    echo "Pushing the image to Docker Hub"
+                    withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPass', usernameVariable: 'dockerHubUser')]) {
+                        sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
+                        sh "docker push ${env.dockerHubUser}/my-note-app:${newTag}"
                     }
                 }
             }
