@@ -4,9 +4,10 @@ pipeline {
     parameters {
         string(name: 'VERSION_TAG', defaultValue: 'latest', description: 'The version tag for the Docker image')
     }
-     environment {
+    
+    environment {
         DOCKER_TAG = "my-note-app:${params.VERSION_TAG}"
-     }
+    }
     
     stages {
         stage("Clone Code") {
@@ -15,8 +16,8 @@ pipeline {
                 git url: "https://github.com/harshrathore24/django-note-app.git", branch: "main"
             }
         }
-   }
-   stage("Build and Run") {
+   
+        stage("Build and Run") {
             steps {
                 script {
                     echo "Using provided version tag"
@@ -37,11 +38,10 @@ pipeline {
 
         stage("Tag and Push to Docker Hub") {
             steps {
-                echo "Tagging the image with the version parameter"
                 script {
                     def imageName = "harshrathore24/my-note-app"
                     def credentialsId = 'dockerHub'
-                    def userVersion = "${params.VERSION}"
+                    def userVersion = "${params.VERSION_TAG}"
 
                     withCredentials([usernamePassword(credentialsId: credentialsId, passwordVariable: 'dockerHubPass', usernameVariable: 'dockerHubUser')]) {
                         def newTag = "v${userVersion}"
@@ -56,4 +56,5 @@ pipeline {
                 }
             }
         }
+    }
 }
