@@ -4,5 +4,6 @@
   become: true
   roles:
     - jenkins
+    - jenkins-job
    
 

@@ -1,0 +1,18 @@
+---
+- name: Trigger Jenkins job
+  uri:
+    url: http://18.116.12.38:8080/job/ansible_run/build
+    method: POST
+    status_code: 201
+    return_content: yes
+  register: job_trigger_result
+
+- name: Wait for job completion (optional)
+  wait_for:
+    path: /var/lib/jenkins/jobs/ansible_run/builds/lastSuccessfulBuild/buildNumber
+    match: '^[0-9]+$'
+  register: job_wait_result
+
+- name: Handle job result (optional)
+  debug:
+    msg: "Job status: {{ job_wait_result.stat.stdout }}"

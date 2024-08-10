@@ -1,0 +1,5 @@
+- name: Get Jenkins crumb
+  uri:
+    url: http://your_jenkins_server:8080/crumbIssuer/api/json
+    return_content: yes
+    register: crumb_result

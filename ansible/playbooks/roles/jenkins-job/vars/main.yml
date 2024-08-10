@@ -1,0 +1,2 @@
+jenkins_server: "http://18.116.12.38:8080"
+job_name: "ansible_run"
