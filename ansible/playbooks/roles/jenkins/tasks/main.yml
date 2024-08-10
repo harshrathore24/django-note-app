@@ -1,0 +1,34 @@
+---
+- name: Download Jenkins GPG key
+  command: >
+    wget -O /tmp/jenkins.io.key https://pkg.jenkins.io/debian-stable/jenkins.io.key
+  args:
+    creates: /tmp/jenkins.io.key
+
+- name: Add Jenkins GPG key
+  shell: |
+    apt-key add /tmp/jenkins.io.key
+
+- name: Add Jenkins repository
+  apt_repository:
+    repo: deb https://pkg.jenkins.io/debian-stable binary/
+    state: present
+
+- name: Update package lists again
+  apt:
+    update_cache: yes
+
+- name: Install Jenkins
+  apt:
+    name: jenkins
+    state: latest
+
+- name: Start Jenkins service
+  service:
+    name: jenkins
+    state: started
+
+- name: Enable Jenkins service
+  service:
+    name: jenkins
+    enabled: yes
