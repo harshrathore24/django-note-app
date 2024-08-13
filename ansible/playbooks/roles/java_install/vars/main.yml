@@ -1,0 +1,4 @@
+java_version: "11"
+java_tarball_url: "https://download.oracle.com/java/17/latest/jdk-17_linux-x64_bin.tar.gz"
+java_install_dir: "/opt/jdk"
+java_user: "newuser"

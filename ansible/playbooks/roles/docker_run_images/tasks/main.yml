@@ -1,0 +1,36 @@
+---
+- name: Manage Docker containers
+  hosts: web_servers
+  become: true
+  tasks:
+    - name: Gather Docker image facts
+      community.docker.docker_image_facts:
+
+    - name: Check if Docker image exists
+      ansible.builtin.set_fact:
+        image_exists: "{{ (docker_images | selectattr('RepoTags', 'search', 'harsh_test5:latest') | list) | length > 0 }}"
+
+    - name: Debug image existence
+      ansible.builtin.debug:
+        msg: "Docker image 'harsh_test5:latest' exists"
+      when: image_exists
+
+    - name: Stop and remove existing container (if any)
+      community.docker.docker_container:
+        name: my-note
+        state: absent
+
+    - name: Run Docker Container
+      community.docker.docker_container:
+        name: my-note
+        image: harsh_test5:latest
+        state: started
+        ports:
+          - "80:8000"
+        restart_policy: always
+      when: image_exists
+
+    - name: Debug if image is not found
+      ansible.builtin.debug:
+        msg: "Docker image 'harsh_test5:latest' does not exist. Skipping container creation."
+      when: not image_exists

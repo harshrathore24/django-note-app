@@ -1,18 +1,28 @@
 ---
 - name: Trigger Jenkins job
   uri:
-    url: http://18.116.12.38:8080/job/ansible_run/build
+    url: "http://3.36.51.251:8080/job/ansible_run/build"
     method: POST
+    headers:
+      Authorization: "Basic {{ 'Harsh:11f3663c1e7dc824d953c3e21fea1b2e80' | b64encode }}"
     status_code: 201
+
+- name: Wait for job completion
+  uri:
+    url: "http://3.36.51.251:8080/job/ansible_run/lastBuild/api/json"
+    method: GET
+    headers:
+      Authorization: "Basic {{ 'Harsh:11f3663c1e7dc824d953c3e21fea1b2e80' | b64encode }}"
     return_content: yes
-  register: job_trigger_result
+  register: job_status
+  until: "job_status_json.result in ['SUCCESS', 'FAILURE']"
+  retries: 3
+  delay: 30
 
-- name: Wait for job completion (optional)
-  wait_for:
-    path: /var/lib/jenkins/jobs/ansible_run/builds/lastSuccessfulBuild/buildNumber
-    match: '^[0-9]+$'
-  register: job_wait_result
+- name: Parse job status JSON
+  set_fact:
+    job_status_json: "{{ job_status.content | from_json }}"
 
-- name: Handle job result (optional)
+- name: Debug parsed job status
   debug:
-    msg: "Job status: {{ job_wait_result.stat.stdout }}"
+    msg: "Parsed job status: {{ job_status_json }}"

@@ -1,4 +1,9 @@
 ---
+- name: Install Java
+  apt:
+    name: openjdk-17-jdk
+    state: present
+    
 - name: Download Jenkins GPG key
   command: >
     wget -O /tmp/jenkins.io.key https://pkg.jenkins.io/debian-stable/jenkins.io.key

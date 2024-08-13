@@ -1,0 +1,16 @@
+---
+- name: Install Java system-wide
+  apt:
+    name: "openjdk-{{ java_version }}-jre-headless"
+    state: present
+
+- name: Set up Java environment variables for specific user
+  lineinfile:
+    path: "/home/{{ java_user }}/.bashrc"
+    line: 'export JAVA_HOME=/usr/lib/jvm/java-{{ java_version }}-openjdk-amd64'
+    state: present
+    create: yes
+    owner: "{{ java_user }}"
+    mode: '0644'
+
+

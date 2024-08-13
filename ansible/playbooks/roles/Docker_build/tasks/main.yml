@@ -1,0 +1,15 @@
+---
+- name: Ensure project directory is absent
+  file:
+    path: /path/to/project
+    state: absent
+
+- name: Clone django-note-app repository
+  git:
+    repo: https://github.com/harshrathore24/django-note-app.git
+    dest: /path/to/project
+    version: main
+
+- name: Build Docker Image
+  command: docker build -t harsh_test5 /path/to/project
+

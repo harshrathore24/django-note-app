@@ -1,9 +1,8 @@
 ---
-- name: Install and configure Nginx
+- name: Install Java for specific user
   hosts: web_servers
   become: true
+  vars_files:
+    - roles/java_install/vars/main.yml
   roles:
-    - jenkins
-    - jenkins-job
-   
-
+    - java_install
