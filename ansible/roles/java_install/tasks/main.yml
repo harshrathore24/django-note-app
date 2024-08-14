@@ -12,5 +12,11 @@
     create: yes
     owner: "{{ java_user }}"
     mode: '0644'
+    
+- name: Ensure the user is logged in to pick up environment changes
+  become: true
+  user:
+    name: "{{ java_user }}"
+    state: present
 
 

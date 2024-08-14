@@ -13,3 +13,10 @@ curl -u Harsh Rathore:d42aa77aa8e42648412ae499d0819c3f http://18.116.12.38:8080/
 path on ansible /usr/local/bin/ansible
 
 #43.201.53.189 ansible_ssh_private_key=/home/ncs/.ssh/id_rsa.pub 
+
+
+ec2-3-37-88-31.ap-northeast-2.compute.amazonaws.com ansible_user=ubuntu ansible_ssh_private_key_file=/home/ncs/Downloads/seoul_key.pem
+
+ssh -i /home/ncs/Downloads/seoul_key.pem ubuntu@ec2-3-39-189-199.ap-northeast-2.compute.amazonaws.com
+
+ping ec2-3-39-189-199.ap-northeast-2.compute.amazonaws.com

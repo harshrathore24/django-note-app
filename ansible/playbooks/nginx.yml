@@ -1,8 +1,0 @@
----
-- name: Install Java for specific user
-  hosts: web_servers
-  become: true
-  vars_files:
-    - roles/java_install/vars/main.yml
-  roles:
-    - java_install

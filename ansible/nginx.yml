@@ -1,0 +1,7 @@
+---
+- name: Install Java for specific user
+  hosts: all
+  become: true
+  roles:
+    - nginx
+    - server

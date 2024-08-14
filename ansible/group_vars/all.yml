@@ -1,0 +1,3 @@
+java_version: "11"
+java_install_dir: "/opt/java"
+java_user: "ubuntu"

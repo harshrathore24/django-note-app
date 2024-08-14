@@ -1,3 +1,0 @@
-[web_servers]
-ec2-3-37-88-31.ap-northeast-2.compute.amazonaws.com ansible_user=ubuntu ansible_ssh_private_key_file=/home/ncs/Downloads/seoul_key.pem
-

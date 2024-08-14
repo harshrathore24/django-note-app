@@ -1,0 +1,7 @@
+---
+- name: Copy file from local to remote server
+  copy:
+    src: "{{ local_file_path }}"
+    dest: "{{ remote_file_path }}"
+    owner: "{{ file_owner }}"
+    mode: '0644'

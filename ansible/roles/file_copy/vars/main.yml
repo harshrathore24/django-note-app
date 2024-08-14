@@ -1,0 +1,5 @@
+---
+local_file_path: "home/ncs/harsh/django-note-app/ansible/roles/file_copy/local_file"
+remote_file_path: "/home/ubuntu/copy_file"
+file_owner: "ubuntu"
+file_group: "ubuntu"
