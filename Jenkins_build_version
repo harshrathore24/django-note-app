@@ -26,7 +26,7 @@ pipeline {
                 sh "docker stop test_version || true"
                 sh "docker rm test_version || true"
 
-                echo "Running the container"
+                echo "Running container"
                 sh "docker run -d -p 8000:8000 --name test_version harshrathore24/my-note-app:latest"
             }
         }
