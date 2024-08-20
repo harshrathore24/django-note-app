@@ -1,0 +1,6 @@
+ec2_ami_id         = "ami-0c55b159cbfafe1f0"
+ec2_instance_type  = "t2.micro"
+ec2_instance_name  = "MyEC2Instance"
+s3_bucket_name     = "my-unique-bucket-name-${random_pet.bucket_suffix.id}"
+s3_environment     = "Dev"
+region             = "us-east-2"

@@ -1,17 +1,36 @@
-
-provider "aws" {
-  region = "us-east-2"  
-}
-
-resource "aws_instance" "my_instance" {
-  ami           = "ami-05c3dc660cb6907f0"  
-  instance_type = "t2.micro"  
-
-  tags = {
-    Name = "MyInstance"
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "5.54.16"  # Specify only one version
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "3.6.2"
+    }
   }
 }
 
-output "instance_public_ip" {
-  value = aws_instance.my_instance.public_ip
+
+provider "aws" {
+  region = var.region
+  
+}
+
+module "ec2_instance" {
+  source         = "./modules/ec2"
+  ami_id          = var.ec2_ami_id
+  instance_type   = var.ec2_instance_type
+  instance_name   = var.ec2_instance_name
+}
+
+module "s3_bucket" {
+  source        = "./modules/s3_buccket"  
+#   bucket_name   = var.s3_bucket_name
+#   environment    = var.s3_environment
+}
+
+
+resource "random_pet" "bucket_suffix" {
+  length = 2
 }
