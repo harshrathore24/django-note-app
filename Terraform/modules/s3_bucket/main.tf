@@ -21,17 +21,18 @@ resource "random_pet" "bucket_name_suffix" {
 }
 
 resource "aws_s3_bucket" "my_bucket" {
-  bucket = "my-bucket-${random_pet.bucket_name_suffix.id}"
-  acl    = "private"
+  bucket = var.bucket_name
 
   tags = {
-    Name        = "my-bucket"
-    Environment = "Dev"
+    Environment = var.environment
+    Name        = var.bucket_name
   }
 }
+
 
 resource "aws_s3_object" "bucket_data" {
   bucket = aws_s3_bucket.my_bucket.bucket
   key    = "mydata.txt"
   source = "myfile.txt"
 }
+
