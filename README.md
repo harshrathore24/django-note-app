@@ -28,30 +28,6 @@ This project allows users to create, update, delete, and manage personal notes w
 * **Version Control:** Git & GitHub
 
 ---
-
-## 📂 Project Structure
-
-```
-django-note-app/
-│── manage.py
-│── requirements.txt
-│── db.sqlite3
-│
-├── note_app/          # Main Django App
-│   ├── models.py
-│   ├── views.py
-│   ├── urls.py
-│   └── templates/
-│
-├── project_name/      # Project Settings
-│   ├── settings.py
-│   ├── urls.py
-│
-└── static/
-```
-
----
-
 ## ⚙️ Installation & Setup
 
 ### 1️⃣ Clone the Repository
@@ -117,13 +93,6 @@ You can deploy using:
 * AWS EC2
 * Nginx + Gunicorn
 * CI/CD (Jenkins / GitHub Actions)
-
----
-
-## 📸 Screenshots
-
-*(Add screenshots here if available)*
-
 ---
 
 ## 🤝 Contributing
@@ -140,13 +109,6 @@ Contributions are welcome!
 ## 📄 License
 
 This project is licensed under the **MIT License**.
-
----
-
-## 👨‍💻 Author
-
-**Harsh Rathore**
-DevOps Engineer
 
 ---
 
